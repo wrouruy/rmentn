@@ -9,7 +9,8 @@ SRC=src/main.c \
 	src/worker/worker.c \
 	src/path/path.c \
 	src/remove/remove.c \
-	src/remove/confirm.c
+	src/remove/confirm.c \
+	src/flags/parse.c
 
 OBJ=$(SRC:.c=.o)
 
