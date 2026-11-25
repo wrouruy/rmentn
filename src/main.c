@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "worker/worker.h"
+#include "remove/remove.h"
 
 int main(int argc, char **argv) {
     if (argc < 3) {
@@ -32,12 +33,10 @@ int main(int argc, char **argv) {
     }
 
     // all workers are done; results can be read safely
-    printf("\nFound directories:\n");
-
     char *path;
 
     while ((path = dequeue(&ctx.results))) {
-        printf("  %s\n", path);
+        rm(path);
         free(path);
     }
 

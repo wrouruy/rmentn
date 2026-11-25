@@ -34,14 +34,14 @@ void enqueue(Queue *queue, char *path);
 // removes an item from the front. call with mutex held
 char *dequeue(Queue *queue);
 
-// adds a found directory to the results
+// adds a found target to the results
 void add_result(Context *ctx, char *path);
 
-// adds a directory to scan
+// adds a targets to scan
 void add_task(Context *ctx, char *path);
 
-// builds the full path of a child entry
-char *join_path(const char *parent, const char *name);
+// // builds the full path of a child entry
+// char *join_path(const char *parent, const char *name);
 
 // scans a single directory
 void scan_directory(Context *ctx, char *path);

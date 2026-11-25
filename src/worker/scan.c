@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include "worker.h"
+#include "../path/path.h"
 
 void add_task(Context *ctx, char *path) {
     pthread_mutex_lock(&ctx->mutex);
@@ -14,18 +15,6 @@ void add_task(Context *ctx, char *path) {
     pthread_cond_signal(&ctx->cond);
 
     pthread_mutex_unlock(&ctx->mutex);
-}
-
-char *join_path(const char *parent, const char *name) {
-    size_t len = strlen(parent) + strlen(name) + 2;
-
-    char *path = malloc(len);
-    if (!path)
-        return NULL;
-
-    snprintf(path, len, "%s/%s", parent, name);
-
-    return path;
 }
 
 void scan_directory(Context *ctx, char *path) {
