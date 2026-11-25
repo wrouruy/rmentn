@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "worker/worker.h"
+
+int main(int argc, char **argv) {
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s <directory> <name>\n", argv[0]);
+        return 1;
+    }
+
+    Context ctx = {0};
+    ctx.target = argv[2];
+
+    pthread_mutex_init(&ctx.mutex, NULL);
+    pthread_cond_init(&ctx.cond, NULL);
+
+    // seed the queue with the root directory
+    enqueue(&ctx.tasks, strdup(argv[1]));
+    ctx.pending = 1;
+
+    pthread_t threads[WORKERS];
+
+    // start workers
+    for (int i = 0; i < WORKERS; i++) {
+        pthread_create(&threads[i], NULL, worker, &ctx);
+    }
+
+    // wait for all workers
+    for (int i = 0; i < WORKERS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // all workers are done; results can be read safely
+    printf("\nFound directories:\n");
+
+    char *path;
+
+    while ((path = dequeue(&ctx.results))) {
+        printf("  %s\n", path);
+        free(path);
+    }
+
+    pthread_mutex_destroy(&ctx.mutex);
+    pthread_cond_destroy(&ctx.cond);
+
+    return 0;
+}
