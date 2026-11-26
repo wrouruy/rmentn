@@ -22,11 +22,12 @@ void *worker(void *arg) {
         }
 
         char *path = dequeue(&ctx->tasks);
+        Flags flags = ctx->flags;
 
         pthread_mutex_unlock(&ctx->mutex);
 
         // scan without holding the mutex
-        scan_directory(ctx, path);
+        scan_directory(ctx, path, flags);
 
         free(path);
 

@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <pthread.h>
+#include "../flags/flags.h"
 
 #define WORKERS 3
 
@@ -26,6 +27,7 @@ typedef struct {
     size_t pending;
 
     char *target;
+    Flags flags;
 } Context;
 
 // appends an item to the queue. call with mutex held
@@ -44,7 +46,7 @@ void add_task(Context *ctx, char *path);
 // char *join_path(const char *parent, const char *name);
 
 // scans a single directory
-void scan_directory(Context *ctx, char *path);
+void scan_directory(Context *ctx, char *path, const Flags flags);
 
 // worker thread entry point
 void *worker(void *arg);

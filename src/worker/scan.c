@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include "worker.h"
 #include "../path/path.h"
+#include "../flags/flags.h"
 
 void add_task(Context *ctx, char *path) {
     pthread_mutex_lock(&ctx->mutex);
@@ -17,7 +18,7 @@ void add_task(Context *ctx, char *path) {
     pthread_mutex_unlock(&ctx->mutex);
 }
 
-void scan_directory(Context *ctx, char *path) {
+void scan_directory(Context *ctx, char *path, const Flags flags) {
     DIR *dir = opendir(path);
 
     if (!dir)
@@ -41,12 +42,15 @@ void scan_directory(Context *ctx, char *path) {
             continue;
         }
 
-        /*
-        if (!S_ISDIR(st.st_mode)) {
+        if (S_ISDIR(st.st_mode) && !flags.directories) {
             free(full_path);
             continue;
         }
-        */
+
+        if (S_ISREG(st.st_mode) && !flags.files) {
+            free(full_path);
+            continue;
+        }
 
         // found a matching directory
         if (!strcmp(entry->d_name, ctx->target)) {
@@ -62,3 +66,14 @@ void scan_directory(Context *ctx, char *path) {
 
     closedir(dir);
 }
+
+
+        // if (!S_ISDIR(st.st_mode) || !flags.directories) {
+        //     free(full_path);
+        //     continue;
+        // }
+
+        // if (!S_ISREG(st.st_mode) || !flags.files) {
+        //     free(full_path);
+        //     continue;
+        // }

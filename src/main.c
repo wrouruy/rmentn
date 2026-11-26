@@ -3,15 +3,18 @@
 #include <string.h>
 #include "worker/worker.h"
 #include "remove/remove.h"
+#include "flags/flags.h"
 
 int main(int argc, char **argv) {
     if (argc < 3) {
         fprintf(stderr, "Usage: %s <directory> <name>\n", argv[0]);
         return 1;
     }
+    Flags flags = parse_flags(argc, argv);
 
     Context ctx = {0};
     ctx.target = argv[2];
+    ctx.flags = flags;
 
     pthread_mutex_init(&ctx.mutex, NULL);
     pthread_cond_init(&ctx.cond, NULL);
@@ -34,9 +37,8 @@ int main(int argc, char **argv) {
 
     // all workers are done; results can be read safely
     char *path;
-
     while ((path = dequeue(&ctx.results))) {
-        rm(path);
+        rm(path, flags);
         free(path);
     }
 

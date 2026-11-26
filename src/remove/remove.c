@@ -5,10 +5,16 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdbool.h>
+
 #include "../path/path.h"
+#include "../flags/flags.h"
 #include "remove.h"
 
-static bool rm_dir(const char *path) {
+static void verbose_message(const char* path) {
+    printf("\033[1m\033[30mdeleted: %s\033[0m\n", path);
+}
+
+static bool rm_dir(const char *path, const bool verbose) {
     DIR *dir = opendir(path);
     if (dir == NULL) {
         perror("opendir");
@@ -38,14 +44,17 @@ static bool rm_dir(const char *path) {
         }
 
         if (S_ISDIR(st.st_mode)) {
-            if (rm_dir(fullpath) != 0) {
+            if (rm_dir(fullpath, verbose) != 0) {
                 status = false;
             }
+            if (verbose) verbose_message(fullpath);
+                
         } else {
             if (unlink(fullpath) != 0) {
                 perror("unlink");
                 status = false;
             }
+            if (verbose) verbose_message(fullpath);
         }
 
         free(fullpath);
@@ -62,23 +71,22 @@ static bool rm_dir(const char *path) {
     return status;
 }
 
-bool rm(const char *path) {
+bool rm(const char *path, const Flags flags) {
     struct stat st;
     if (lstat(path, &st) == -1) {
         perror("lstat");
         return false;
     }
 
-    if(!rm_confirm(path))
-        return true;
+    if (S_ISDIR(st.st_mode) && (flags.auto_confirm || rm_confirm(path, file_type_regular)))
+        return rm_dir(path, flags.verbose);
 
-    if (S_ISDIR(st.st_mode)) {
-        return rm_dir(path);
-    }
-
-    if (unlink(path) != 0) {
-        perror("unlink");
-        return false;
+    if (S_ISREG(st.st_mode) && (flags.auto_confirm || rm_confirm(path, file_type_regular))) {
+        if (unlink(path) != 0) {
+            perror("unlink");
+            return false;
+        }
+        if (flags.verbose) verbose_message(path);
     }
 
     return true;
