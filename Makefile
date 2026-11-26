@@ -1,5 +1,6 @@
 CC=gcc
 CCFLAGS=-std=gnu17 -Wall -Wextra -pthread
+PREFIX=/usr/local
 TARGET=rmentn
 
 SRC=src/main.c \
@@ -20,6 +21,12 @@ $(TARGET): $(OBJ)
 
 %.o: %.c
 	$(CC) $(CCFLAGS) -c $< -o $@
+
+install: $(TARGET)
+	install -Dm755 $(TARGET) $(PREFIX)/bin/$(TARGET)
+
+uninstall:
+	rm -f $(PREFIX)/bin/$(TARGET)
 
 clean:
 	rm -f $(OBJ) $(TARGET)
