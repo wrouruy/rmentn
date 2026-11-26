@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flags.h"
+#include "../error/error.h"
 
 static void parse_subflag(const char* s, Flags* f) {
-    if (s[1] == '\0') {
-        fprintf(stderr, "err: empty flag '-'\n");
-        exit(1);
-    }
+    if (s[1] == '\0')
+        raise_error("err: empty flag '-'");
 
     for (size_t i = 1; s[i] != '\0'; i++) {
         switch (s[i]) {
@@ -27,18 +26,17 @@ static void parse_subflag(const char* s, Flags* f) {
 Flags parse_flags(int argc, char **argv) {
     Flags f = {0};
     
-    f.interact = true;
-
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
             parse_subflag(argv[i], &f);
         }
     }
     
-    if (f.interact && f.auto_confirm) {
-        fprintf(stderr, "err: an unexpected combination of flags: '-i' and '-y'\n");
-        exit(1);
-    }
+    if (f.interact && f.auto_confirm)
+        raise_error("an unexpected combination of flags: '-i' and '-y'");
+
+    if (f.dry_run && ( f.interact || f.auto_confirm || f.verbose ))
+        raise_error("use the '-n' flag without '-i', '-y', or '-v'");
 
     if (!f.directories && !f.files) {
         f.directories = true;

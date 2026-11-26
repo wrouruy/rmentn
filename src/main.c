@@ -5,6 +5,10 @@
 #include "remove/remove.h"
 #include "flags/flags.h"
 
+static void dry_run_message(const char* path) {
+    printf("\033[90mfound:\033[0m %s\n", path);
+}
+
 int main(int argc, char **argv) {
     if (argc < 3) {
         fprintf(stderr, "Usage: %s <directory> <name>\n", argv[0]);
@@ -38,7 +42,10 @@ int main(int argc, char **argv) {
     // all workers are done; results can be read safely
     char *path;
     while ((path = dequeue(&ctx.results))) {
-        rm(path, flags);
+        if (flags.dry_run)
+            dry_run_message(path);
+        else rm(path, flags);
+
         free(path);
     }
 
