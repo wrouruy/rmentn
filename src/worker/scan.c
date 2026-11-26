@@ -42,38 +42,26 @@ void scan_directory(Context *ctx, char *path, const Flags flags) {
             continue;
         }
 
-        if (S_ISDIR(st.st_mode) && !flags.directories) {
-            free(full_path);
-            continue;
+        bool is_dir = S_ISDIR(st.st_mode);
+        bool is_file = S_ISREG(st.st_mode);
+
+        bool matches_type =
+            (!flags.directories && !flags.files) ||
+            (flags.directories && is_dir) ||
+            (flags.files && is_file);
+
+        if (matches_type && !strcmp(entry->d_name, ctx->target)) {
+            char *result_path = strdup(full_path);
+
+            if (result_path)
+                add_result(ctx, result_path);
         }
 
-        if (S_ISREG(st.st_mode) && !flags.files) {
+        if (is_dir)
+            add_task(ctx, full_path);
+        else
             free(full_path);
-            continue;
-        }
-
-        // found a matching directory
-        if (!strcmp(entry->d_name, ctx->target)) {
-            add_result(ctx, strdup(full_path));
-
-            free(full_path);
-            continue;
-        }
-
-        // hand the child directory to a worker
-        add_task(ctx, full_path);
     }
 
     closedir(dir);
 }
-
-
-        // if (!S_ISDIR(st.st_mode) || !flags.directories) {
-        //     free(full_path);
-        //     continue;
-        // }
-
-        // if (!S_ISREG(st.st_mode) || !flags.files) {
-        //     free(full_path);
-        //     continue;
-        // }
