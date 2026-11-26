@@ -4,7 +4,7 @@ TARGET=rmentn
 
 SRC=src/main.c \
 	src/worker/scan.c \
-	src/worker/enqueue.c \
+	src/worker/queue.c \
 	src/worker/result.c \
 	src/worker/worker.c \
 	src/path/path.c \
