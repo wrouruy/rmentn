@@ -4,8 +4,6 @@
 #include <pthread.h>
 #include "../flags/flags.h"
 
-#define WORKERS 3
-
 typedef struct Node {
     char *path;
     struct Node *next;

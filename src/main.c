@@ -27,15 +27,15 @@ int main(int argc, char **argv) {
     enqueue(&ctx.tasks, strdup(argv[1]));
     ctx.pending = 1;
 
-    pthread_t threads[WORKERS];
+    pthread_t threads[flags.worker];
 
     // start workers
-    for (int i = 0; i < WORKERS; i++) {
+    for (size_t i = 0; i < flags.worker; i++) {
         pthread_create(&threads[i], NULL, worker, &ctx);
     }
 
     // wait for all workers
-    for (int i = 0; i < WORKERS; i++) {
+    for (size_t i = 0; i < flags.worker; i++) {
         pthread_join(threads[i], NULL);
     }
 

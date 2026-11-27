@@ -13,6 +13,7 @@ typedef struct {
     bool verbose;      // -v
 
     bool dry_run;      // -n
+    size_t worker;     // -j<int>
 } Flags;
 
 Flags parse_flags(int argc, char **argv);

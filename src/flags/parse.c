@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <ctype.h>
+
 #include "flags.h"
 #include "../error/error.h"
 
@@ -16,9 +19,27 @@ static void parse_subflag(const char* s, Flags* f) {
             case 'f': f->files = true; break;
             case 'v': f->verbose = true; break;
             case 'n': f->dry_run = true; break;
+            case 'j': {
+                size_t worker = 0;
+                size_t start = i + 1;
+
+                for (i = start; isdigit((unsigned char)s[i]); i++) {
+                    size_t digit = (size_t)(s[i] - '0');
+                    if (worker > (SIZE_MAX - digit) / 10)
+                        raise_error("'-j' value is too large");
+                    worker = worker * 10 + digit;
+                }
+
+                if (i == start)
+                    raise_error("'-j' requires a number");
+
+                f->worker = worker;
+                i--; // let the outer loop advance past the last digit
+                break;
+            }
+
             default:
-                fprintf(stderr, "err: unknown flag '-%c'\n", s[i]);
-                exit(1);
+                raise_error("unknown flag '-%c'\n", s[i]);
         }
     }
 }
@@ -26,6 +47,7 @@ static void parse_subflag(const char* s, Flags* f) {
 Flags parse_flags(int argc, char **argv) {
     Flags f = {0};
     
+    f.worker = 3;
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
             parse_subflag(argv[i], &f);
