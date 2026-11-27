@@ -6,6 +6,7 @@
 #include "worker.h"
 #include "../path/path.h"
 #include "../flags/flags.h"
+#include "../wildcard/wildcard.h"
 
 void add_task(Context *ctx, char *path) {
     pthread_mutex_lock(&ctx->mutex);
@@ -50,7 +51,7 @@ void scan_directory(Context *ctx, char *path, const Flags flags) {
             (flags.directories && is_dir) ||
             (flags.files && is_file);
 
-        if (matches_type && !strcmp(entry->d_name, ctx->target)) {
+        if (matches_type && wildcard_match(ctx->target, entry->d_name, strlen(ctx->target), strlen(entry->d_name))) {
             char *result_path = strdup(full_path);
 
             if (result_path)

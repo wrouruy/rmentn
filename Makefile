@@ -12,7 +12,8 @@ SRC=src/main.c \
 	src/remove/remove.c \
 	src/remove/confirm.c \
 	src/flags/parse.c \
-	src/error/error.c
+	src/error/error.c \
+	src/wildcard/match.c
 
 OBJ=$(SRC:.c=.o)
 
