@@ -4,17 +4,13 @@
 #include "worker/worker.h"
 #include "remove/remove.h"
 #include "flags/flags.h"
-
-static void dry_run_message(const char* path) {
-    printf("\033[90mfound:\033[0m %s\n", path);
-}
+#include "flags/flag/flag.h"
 
 int main(int argc, char **argv) {
-    if (argc < 3) {
-        fprintf(stderr, "Usage: %s <directory> <name>\n", argv[0]);
-        return 1;
-    }
     Flags flags = parse_flags(argc, argv);
+
+    if (argc < 3 || flags.help)
+        help_message(argv[0]);
 
     Context ctx = {0};
     ctx.target = argv[2];
