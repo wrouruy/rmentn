@@ -57,6 +57,9 @@ Flags parse_flags(int argc, char **argv) {
     if (f.interact && f.auto_confirm)
         raise_error("an unexpected combination of flags: '-i' and '-y'");
 
+    if (f.interact && f.verbose)
+        raise_error("an unexpected combination of flags: '-i' and '-v'");
+
     if (f.dry_run && ( f.interact || f.auto_confirm || f.verbose ))
         raise_error("use the '-n' flag without '-i', '-y', or '-v'");
 

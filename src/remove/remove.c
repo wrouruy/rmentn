@@ -8,11 +8,8 @@
 
 #include "../path/path.h"
 #include "../flags/flags.h"
+#include "../flags/flag/flag.h"
 #include "remove.h"
-
-static void verbose_message(const char* path) {
-    printf("\033[90mdeleted: %s\033[0m\n", path);
-}
 
 static bool rm_dir(const char *path, const bool verbose) {
     DIR *dir = opendir(path);

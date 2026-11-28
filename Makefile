@@ -14,8 +14,9 @@ SRC=src/main.c \
 	src/flags/parse.c \
 	src/error/error.c \
 	src/wildcard/match.c \
+	src/flags/flag/help.c \
+	src/flags/flag/verbose.c \
 	src/flags/flag/dry_run.c \
-	src/flags/flag/help.c
 
 OBJ=$(SRC:.c=.o)
 
